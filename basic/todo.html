@@ -173,12 +173,12 @@
       <li class="list-group-item" v-for="(item, key) in filteredTodos" @dblclick="editTodo(item)">
         <div class="d-flex" v-if="item.id !== cacheTodo.id">
           <div class="form-check">
-            <input type="checkbox" class="form-check-input" v-model="item.completed" :id="item.id">
+            <input type="checkbox" class="form-check-input" v-model="item.completed" :id="item.id" @click="countTask(item)">
             <label class="form-check-label" :class="{'completed': item.completed}" :for="item.id">
               {{ item.title }}
             </label>
           </div>
-          <button type="button" class="close ml-auto" aria-label="Close" @click="removeTodo(key)">
+          <button type="button" class="close ml-auto" aria-label="Close" @click="removeTodo(item)">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -190,8 +190,8 @@
       </li> -->
     </ul>
     <div class="card-footer d-flex justify-content-between">
-      <span>還有 3 筆任務未完成</span>
-      <a href="#">清除所有任務</a>
+      <span>還有 {{ count }} 筆任務未完成</span>
+      <a href="#" @click="removeAllTask">清除所有任務</a>
     </div>
   </div>
 </div>
@@ -208,7 +208,8 @@ var app = new Vue({
     }],
     cacheTodo: {},
     cacheTitle: '',
-    visibility: 'all'
+    visibility: 'all',
+    count: 1
   },
   methods: {
       addTodo: function() {
@@ -222,9 +223,27 @@ var app = new Vue({
           completed: false 
         });
         this.newTodo = '';
+        this.count++;
       },
-      removeTodo: function(key) {
-        this.todos.splice(key, 1);
+      // removeTodo: function(todo) {
+      //   var newIndex = '';
+      //   var vm = this;
+      //   vm.todos.forEach(function(item, key) {
+      //     if(todo.id === item.id) {
+      //       newIndex = key;
+      //     }
+      //   }) 
+      //   this.todos.splice(newIndex, 1);
+      // },
+      // 精簡寫法
+      removeTodo: function(todo) {
+        var vm = this;
+        var newIndex = vm.todos.findIndex(function(item, key) {
+          return todo.id === item.id;
+        })
+        this.todos.splice(newIndex, 1);
+        if(!todo.completed === true)
+          this.count--;
       },
       editTodo: function(item) {
         this.cacheTodo = item;
@@ -237,6 +256,13 @@ var app = new Vue({
         item.title = this.cacheTitle;
         this.cacheTitle = '';
         this.cacheTodo = {};
+      },
+      countTask: function(item) {
+        item.completed === true ? this.count++ : this.count--;
+      },
+      removeAllTask: function() {
+        this.todos = [];
+        this.count = 0;
       }
     },
     computed: {
