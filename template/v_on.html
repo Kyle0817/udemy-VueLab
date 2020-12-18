@@ -112,13 +112,13 @@
   <p>請切換下方 box 的 className</p>
   <div class="box" :class="{'rotate': isRotate }"></div>
   <hr>
-  <button class="btn btn-outline-primary">切換 box 樣式</button>
+  <button class="btn btn-outline-primary" @click="changeRotate">切換 box 樣式</button>
   <hr>
   <h4>帶入參數</h4>
   <ul>
     <li v-for="item in arrayData" class="my-2">
       {{ item.name }} 有 {{ item.cash }} 元 
-      <button class="btn btn-sm btn-outline-primary">儲值</button>
+      <button class="btn btn-sm btn-outline-primary" @click="storeMoney(item)">儲值</button>
     </li>
   </ul>
   <h4>修飾符</h4>
@@ -213,6 +213,7 @@ var app = new Vue({
     },
     storeMoney: function(item) {
       item.cash = item.cash + 500;
+      // item.cash += 500;
     },
     trigger: function(name) {
       console.log(name, '此事件被觸發了')
