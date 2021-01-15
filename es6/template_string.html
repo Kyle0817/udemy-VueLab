@@ -102,10 +102,13 @@
   </ol>
 </div>
 
+<div id="app"></div>
 
 <script>
 // #1 樣板字串
 // 將以下改寫成 Template String 寫法
+
+
 const people = [
   {
     name: '小明',
@@ -129,6 +132,25 @@ let originUl = '<ul>\
 
 console.log(originString, originUl);
 
+// let newString = `我叫做 ${people[0].name}`;
+// console.log(newString);
+
+let newUrl = `
+    <ul>
+      <li>我叫做 ${people[0].name} </li>
+      <li>我叫做 ${people[1].name} </li>
+      <li>我叫做 ${people[2].name} </li>
+    </ul>'
+`
+console.log(newUrl);
+
+newUrl = `
+    <ul>
+      ${people.map(person => `<li>我叫做 ${person.name}</li>`).join('')}
+    </ul>
+`
+console.log(newUrl);
+$("#app").html(newUrl);
 </script> 
         </div>
       </div>

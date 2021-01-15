@@ -127,15 +127,17 @@ var child = {
   },
   methods: {
     addData: function() {
-      this.data.item = {
-        name: this.item.name
-      }
-      console.log(this.data, this);
-
-      // this.$set(this.data, 'item', {
+      // this.data.item = {
       //   name: this.item.name
-      // });
+      // }
       // console.log(this.data, this);
+      
+      // (target = Object or Array, key = String or Number, value = anything)
+      //this.$set(target, key, value)
+      this.$set(this.data, 'item', {
+        name: this.item.name
+      })
+      console.log(this.data, this);
     }
   },
   mounted: function() {

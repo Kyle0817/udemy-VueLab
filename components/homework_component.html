@@ -128,42 +128,22 @@
 </div>
 
 <div id="app">
-  <select name="" id="" class="form-control mb-3">
-    <option value="">--- 請選擇城市 ---</option>
+  <select name="" id="" class="form-control mb-3" v-model="filter">
+    <option disabled value="">--- 請選擇城市 ---</option>
+    <option v-for="(city, key) in cityOption" :value="city" :key="key">{{ city }}</option>
   </select>
   <div>
     <h4>關注城市</h4>
     <div class="card-columns">
-      <div class="card status-aqi2">
-        <div class="card-header">苗栗縣 - 三義
-          <a href="#" class="float-right"><i class="fas fa-star"></i></a>
-        </div>
-        <div class="card-body">
-          <ul class="list-unstyled">
-            <li>AQI 指數: 54</li>
-            <li>PM2.5: 8</li>
-            <li>說明: 普通</li>
-          </ul>
-          2018-05-20 16:00
-        </div>
-      </div>
+      <card-component :item="item" :stared="stared" 
+        v-for="item in newStared" @show-stared="showAllStared" v-if="item.SiteName" :key="item.SiteId">
+      </card-component>
     </div>
-  </div>
-  
-  <hr>
-  <div class="card-columns">
-    <div class="card status-aqi2">
-      <div class="card-header">苗栗縣 - 三義
-        <a href="#" class="float-right"><i class="far fa-star"></i></a>
-      </div>
-      <div class="card-body">
-        <ul class="list-unstyled">
-          <li>AQI 指數: 54</li>
-          <li>PM2.5: 8</li>
-          <li>說明: 普通</li>
-        </ul>
-      2018-05-20 16:00
-      </div>
+     <hr>
+    <div class="card-columns">
+     <card-component :item="item" :stared="stared"
+        v-for="item in filterCounty" @show-stared="showAllStared" :key="item.SiteId">
+     </card-component>
     </div>
   </div>
 </div>
@@ -171,27 +151,97 @@
 <script>
 // API 來源
 // https://opendata.epa.gov.tw/Data/Contents/AQI/
+Vue.component('card-component', {
+  props: ['item', 'stared'],
+  template: `<div class="card" :class="status[item.Status]">
+                <div class="card-header">{{ item.County }} - {{ item.SiteName }}
+                  <a href="#" class="float-right" @click.prevent="showStared()">
+                    <i class="fa-star " :class="starClass"></i>
+                  </a>
+                </div>
+              <div class="card-body">
+                <ul class="list-unstyled">
+                  <li>AQI 指數: {{ item.AQI }}</li>
+                  <li>PM2.5: {{ item['PM2.5'] }}</li>
+                  <li>說明: {{ item.Status }}</li>
+                </ul>
+                {{ item.PublishTime }}
+              </div>
+             </div>
+            </div>`,
+    data: function() {
+      return {
+        status: {
+          '良好': '',
+          '普通': 'status-aqi2',
+          '對敏感族群不健康': 'status-aqi3',
+          '對所有族群不健康': 'status-aqi4',
+          '非常不健康': 'status-aqi5',
+          '危害': 'status-aqi6' 
+        }
+      }
+    },
+    methods: {
+      showStared: function() {
+        this.$emit('show-stared', this.item, this.starIndex);
+      }
+    },
+    computed: {
+      starClass: function() {
+        const vm = this;
+        vm.starIndex = vm.stared.indexOf(vm.item.SiteName);
+        return vm.starIndex === -1 ? " far" : " fas";
+      }
+    }
+});
 
-var app = new Vue({
+
+const app = new Vue({
   el: '#app',
   data: {
     data: [],
     location: [],
-    stared: [],
+    stared: JSON.parse(localStorage.getItem("item")) || [],
     filter: '',
   },
   // 請在此撰寫 JavaScript
-  methods: {
-    getData() {
+  created : function() {
       const vm = this;
       const api = 'http://opendata2.epa.gov.tw/AQI.json';
 
-      // 使用 jQuery ajax
-      $.get(api).then(function( response ) {
+      $.get(api).then(function(response) {
         vm.data = response;
-        console.log(response)
       });
+  },
+  computed: {
+    cityOption : function() {
+      const vm = this;
+      vm.data.forEach(em => vm.location.push(em.County));
+      return Array.from(new Set(vm.location));
     },
+    filterCounty: function() {
+      const vm = this;
+      
+      if(!vm.filter)
+        return this.data;
+      return vm.data.filter(em => em.County === vm.filter);
+    },
+    newStared: function() {
+      const vm = this;
+      return vm.data.filter(em => vm.stared.indexOf(em.SiteName) !== -1);
+    }
+  },
+  methods: {
+    showAllStared: function(item, index) {
+      const vm = this;
+      
+      if(index === -1) 
+        vm.stared.push(item.SiteName);
+      else
+        vm.stared.splice(index, 1);
+
+      localStorage.setItem("item", JSON.stringify(vm.stared));
+    }
   }
 });
 </script>

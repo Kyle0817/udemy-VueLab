@@ -106,13 +106,15 @@
 <script>
 // #1
 // 修改 var -> let
-var mom = '老媽';
-(function () {
-  console.log(mom);
-})();
+// var mom = '老媽';
+// (function () {
+//   console.log(mom);
+// })();
 
 // #2
 // 修改 var -> let
+// var 作用域 function scope
+// let 作用域是 block
 // function varMing () {
 //   var ming = '小明';
 //   if (true) {
@@ -144,15 +146,27 @@ var mom = '老媽';
 //   sister: '小橙'
 // };
 // family.father = '爸爸';
+// 物件，本身是傳參考
 
 // #6
 // 額外問題，不使用 let，上述答案如何解答
+// 加入第三個參數方法
 // for (var i = 0; i < 10; i++) {
 //   console.log(i);
-//   setTimeout(function () {
+//   setTimeout(function (i) {
 //     console.log('這執行第' + i + '次');
-//   }, 10);
+//   }, 10, i);
 // }
+
+// 立即函式的方法
+for (var i = 0; i < 10; i++) {
+  console.log(i);
+  (function(i) {
+    setTimeout(function () {
+    console.log('這執行第' + i + '次');
+  }, 10);
+  }(i))
+}
 </script> 
         </div>
       </div>
